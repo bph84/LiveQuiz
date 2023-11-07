@@ -2,6 +2,7 @@
 .fleet/
 .vscode/
 build/
+cache/
 config/
 vendor/
 .php_cs
