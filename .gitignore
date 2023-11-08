@@ -1,3 +1,9 @@
-
-client/config.php
-master/config.php
+.idea/
+.fleet/
+.vscode/
+build/
+cache/
+config/
+vendor/
+.php_cs
+composer.lock
