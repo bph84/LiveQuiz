@@ -1,6 +1,6 @@
 ## LiveQuiz
 
-// TODO: Project description here
+[//]: # (TODO Project description here)
 
 ### Setup client
 
