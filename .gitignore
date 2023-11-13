@@ -7,3 +7,5 @@ config/
 vendor/
 .php_cs
 composer.lock
+client/config.php
+master/config.php
