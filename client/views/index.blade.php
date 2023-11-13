@@ -57,7 +57,7 @@
     let selectedAnswer = '';
 
     function connect() {
-        ws = new WebSocket("{{ config.WS_URL }}");
+        ws = new WebSocket("{{$config['WS_URL']}}");
 
         ws.onopen = () => {
             conStat.innerHTML = 'Connected';
@@ -141,14 +141,14 @@
         document.querySelector('#accept').addEventListener('click', () => {
             console.log("Accepted terms");
             document.querySelector('#acceptTerms').style.display = 'none';
-            document.cookie = "acceptTerms=" + Date.now() + "; domain={{ config.COOKIE_DOMAIN }}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+            document.cookie = "acceptTerms=" + Date.now() + "; domain={{$config['COOKIE_DOMAIN']}}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT";
             document.querySelector('#yourName').style = '';
         });
 
         document.querySelector('#setName').addEventListener('click', () => {
             console.log("Set name");
             document.querySelector('#yourName').style.display = 'none';
-            document.cookie = "usersName=" + document.querySelector('#name').value + "; domain={{ config.COOKIE_DOMAIN }}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+            document.cookie = "usersName=" + document.querySelector('#name').value + "; domain={{$config['COOKIE_DOMAIN']}}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT";
             document.querySelector('#guidance').style = '';
             document.querySelector('#container').style = '';
 

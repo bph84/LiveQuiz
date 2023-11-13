@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../bootstrap/bootstrap.php';
 
-require_once __DIR__ . '/../bootstrap/boostrap.php';
-
-require(ROOT_DIR . '/config.php');
-echo $twig->render('index.html', [
+$configs = require(ROOT_DIR . '/config/config.php');
+echo $blade->run('index', [
     'config' => $configs,
 ]);
