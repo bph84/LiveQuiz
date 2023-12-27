@@ -6,10 +6,16 @@ use eftec\bladeone\BladeOne;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Show and log errors
+
+/*
+
+// These settings will hide all errors and warnings! 
+
 ini_set('display_errors', '0');
 ini_set('log_errors', '0');
 error_reporting(-1); // E_ALL || -1
+
+*/
 
 define('ROOT_DIR', dirname(__DIR__));
 
