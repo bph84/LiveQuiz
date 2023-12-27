@@ -1,6 +1,6 @@
 
 import { WebSocketServer } from 'ws';
-import config from './config.js';
+import 'dotenv/config'
 
 const wss = new WebSocketServer({ port: 7071 });
 
@@ -151,7 +151,7 @@ wss.on('connection', (ws, request) => {
         }
 
         if (message.authorize) {
-            if (message.key == config.masterKey) {
+            if (message.key == process.env.MASTER_KEY) {
 
                 masterConnection = ws;
                 ws.send(JSON.stringify({authorized: true, authType: 'master'}));
@@ -165,7 +165,7 @@ wss.on('connection', (ws, request) => {
                     handleMasterMessage(messageBuffer);
                 });
 
-            } else if (message.key == config.viewerKey) {
+            } else if (message.key == process.env.VIEWER_KEY) {
 
                 ws.send(JSON.stringify({authorized: true, authType: 'viewer'}));
                 notifyViewer = (message) => {
