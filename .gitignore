@@ -11,3 +11,4 @@ client/config.php
 master/config.php
 websocket-server/node_modules/*
 websocket-server/package-lock.json
+.env
