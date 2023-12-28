@@ -1,8 +1,20 @@
 
 import { WebSocketServer } from 'ws';
 import 'dotenv/config'
+import { loadQuestions, getNextQuestion } from './questions.js';
+import fs from 'fs';
+
+loadQuestions();
+globalThis.questions = loadQuestions;
 
 const wss = new WebSocketServer({ port: 7071 });
+
+const logFile = 'log.txt';
+const stream = fs.createWriteStream(logFile, { flags: 'a' });
+
+// Write data to the file
+stream.write('Server Started!\n');
+
 
 let connectionCount = 0;
 const allClients = new Map();
@@ -23,7 +35,11 @@ setInterval(() => {
 
 const log = (message) => {
     console.log(message);
+    stream.write(message + "\n");
 }
+
+setupWss();
+
 
 function tryParseJSONObject (jsonString){
     try {
@@ -92,7 +108,28 @@ function handleViewerMessage(messageBuffer) {
     log("Viewer message!" + messageBuffer.toString('utf-8'));
 }
 
+function handleSurveyMessage(notifyViewer, myConnectionId, messageBuffer) {
 
+    log("Survey message from" + myConnectionId + messageBuffer.toString('utf-8'));
+    const message = tryParseJSONObject(messageBuffer);
+    
+    if (message.getNextQuestion) {
+ 
+        const nextQuestion = getNextQuestion(message.getNextQuestion);
+
+        if (nextQuestion) {
+
+            notifyViewer(
+                {...nextQuestion,
+                nextQuestion: true   
+                });
+        } else {
+            notifyViewer({surveyDone: true});
+        }
+    }
+}
+
+function setupWss() {
 wss.on('connection', (ws, request) => {
 
     connectionCount++;
@@ -151,13 +188,37 @@ wss.on('connection', (ws, request) => {
         }
 
         if (message.authorize) {
-            if (message.key == process.env.MASTER_KEY) {
+            handleAuthorize();
+        }
+
+        function handleAuthorize() {
+
+            if (message.key == process.env.SURVEY_KEY) {
+
+                ws.send(JSON.stringify({ authorized: true, authType: 'survey' }));
+
+                ws.send(JSON.stringify(
+                    {...getNextQuestion(),
+                     nextQuestion: true   
+                    }));
+
+                const notifyViewer = (msg) => {
+                    ws.send(JSON.stringify(msg));
+                }
+
+                ws.removeEventListener('message');
+
+                ws.on('message', (messageBuffer) => {
+                    handleSurveyMessage(notifyViewer, ws.myConnectionId, messageBuffer);
+                });
+
+            } else if (message.key == process.env.MASTER_KEY) {
 
                 masterConnection = ws;
-                ws.send(JSON.stringify({authorized: true, authType: 'master'}));
+                ws.send(JSON.stringify({ authorized: true, authType: 'master' }));
                 notifyMaster = (message) => {
                     ws.send(JSON.stringify(message));
-                }
+                };
 
                 ws.removeEventListener('message');
 
@@ -167,10 +228,10 @@ wss.on('connection', (ws, request) => {
 
             } else if (message.key == process.env.VIEWER_KEY) {
 
-                ws.send(JSON.stringify({authorized: true, authType: 'viewer'}));
+                ws.send(JSON.stringify({ authorized: true, authType: 'viewer' }));
                 notifyViewer = (message) => {
                     ws.send(JSON.stringify(message));
-                }
+                };
 
                 ws.removeEventListener('message');
 
@@ -179,7 +240,7 @@ wss.on('connection', (ws, request) => {
                 });
 
             } else {
-                ws.send(JSON.stringify({authorized: false}));
+                ws.send(JSON.stringify({ authorized: false }));
             }
         }
     });
@@ -196,4 +257,4 @@ wss.on('connection', (ws, request) => {
     );
 
 });
-
+}
